@@ -1,0 +1,11 @@
+
+<h1>{{ post.title }}</h1>
+<h2>{{ post.author }}</h2>
+<p>{{ post.content }}</p>
+<p>{{ post.created_at }}</p>
+<h3>댓글</h3>
+{% for comment in post.comments.all %}
+    <h2>{{ comment.author }}</h2>
+    <p>{{ comment.content }}</p>
+    <p>{{ comment.created_at }}</p>
+{% endfor %}

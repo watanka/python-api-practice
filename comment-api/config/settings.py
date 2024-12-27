@@ -72,6 +72,15 @@ TEMPLATES = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.TemplateHTMLRenderer',
+    ],
+    'DEFAULT_TEMPLATE_CONTEXT_PROCESSORS': [
+        'django.template.context_processors.request',
+    ],
+}
+
 WSGI_APPLICATION = "config.wsgi.application"
 
 

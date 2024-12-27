@@ -1,0 +1,6 @@
+{% for post in posts %}
+    <h1><a href="{% url 'post_detail' post.id %}">{{ post.title }}</a></h1>
+    <h2>{{ post.author }}</h2>
+    <p>{{ post.updated_at }}</p>
+    <p>{{ post.comments.count }}</p>
+{% endfor %}
