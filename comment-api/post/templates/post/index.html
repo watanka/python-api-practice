@@ -1,6 +1,80 @@
-{% for post in posts %}
-    <h1><a href="{% url 'post_detail' post.id %}">{{ post.title }}</a></h1>
-    <h2>{{ post.author }}</h2>
-    <p>{{ post.updated_at }}</p>
-    <p>{{ post.comments.count }}</p>
-{% endfor %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'post/css/post-list.css' %}">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>게시판</h1>
+            <a href="{% url 'post_list_create' %}" class="new-post-button">
+                <i class="fas fa-plus"></i> 새 글 작성
+            </a>
+        </div>
+
+        <form class="search-container" method="get">
+            <input  type="text" 
+                    name="search" 
+                    class="search-input"
+                    placeholder="검색어를 입력하세요..."
+                    value="{{ request.GET.search|default:''}}">
+            <button type="submit" class="search-button">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
+
+        <div class="posts-container">
+            {% for post in posts %}
+                <div class="post-card">
+                    <a href="{% url 'post_detail' post.id %}">
+                        {{ post.title }}
+                    </a>
+                    <div class="post-meta">
+                        <span>
+                            {{ post.author.username }} . {{ post.created_at|date:"Y-m-d H:i" }}
+                        </span>
+                        <span class="post-comments">
+                            <i class="fas fa-comment"></i> {{ post.comments.count }}
+                        </span>
+                    </div>
+                </div>
+            {% empty %}
+                <p>게시글이 없습니다.</p>
+            {% endfor %}
+        </div>
+
+        {% if is_paginated %}
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span class="current">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

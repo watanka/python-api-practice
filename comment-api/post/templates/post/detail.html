@@ -1,11 +1,91 @@
+{% load static %}
 
-<h1>{{ post.title }}</h1>
-<h2>{{ post.author }}</h2>
-<p>{{ post.content }}</p>
-<p>{{ post.created_at }}</p>
-<h3>댓글</h3>
-{% for comment in post.comments.all %}
-    <h2>{{ comment.author }}</h2>
-    <p>{{ comment.content }}</p>
-    <p>{{ comment.created_at }}</p>
-{% endfor %}
+<link rel="stylesheet" href="{% static 'post/css/post.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<div class="post-container">
+    <div class="post-header">
+        <h1 class="post-title">{{ post.title }}</h1>
+        <a href="{% url 'post_list_create' %}" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+    <div class="post-info">
+        <span class="post-author">작성자: {{ post.author }}</span>
+        <span class="post-date">{{ post.created_at|date:"Y-m-d H:i" }}</span>
+    </div>
+    <p class="post-content">{{ post.content }}</p>
+</div>
+
+<div class="comments-section">
+    <h3 class="comments-title">댓글 <span class="comment-count">{{ post.comments.count }}</span></h3>
+    
+    <form id="comment-form" action="{% url 'comment_create' post_id=post.id %}" method="post">
+        {% csrf_token %}
+        <div class="comment-input-container">
+            <input type="text" name="content" placeholder="댓글을 입력하세요..." required>
+            <button type="submit">작성</button>
+        </div>
+    </form>
+
+    <div class="comments-container">
+        {% for comment in post.comments.all %}
+            <div class="comment">
+                <div class="comment-header">
+                    <span class="comment-author">{{ comment.author }}</span>
+                    <span class="comment-date">{{ comment.created_at|date:"Y-m-d H:i" }}</span>
+                </div>
+                <p class="comment-content">{{ comment.content }}</p>
+            </div>
+        {% empty %}
+            <p class="no-comments">첫 댓글을 작성해보세요!</p>
+        {% endfor %}
+    </div>
+</div>
+</div>
+
+<script>
+    document.getElementById('comment-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const content = this.querySelector('input[name="content"]').value;
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        try {
+            const response = await fetch(`/posts/${post.id}/comments/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    content: content
+                })
+            });
+    
+            if (!response.ok) {
+                throw new Error('댓글 작성에 실패했습니다.');
+            }
+    
+            const newComment = await response.json();
+            
+            // 새 댓글을 화면에 추가
+            const commentsContainer = document.getElementById('comments-container');
+            const commentElement = document.createElement('div');
+            commentElement.className = 'comment';
+            commentElement.innerHTML = `
+                <p>${newComment.content}</p>
+                <h2>${newComment.author}</h2>
+                <p>${newComment.created_at}</p>
+            `;
+            commentsContainer.insertBefore(commentElement, commentsContainer.firstChild);
+            
+            // 입력 필드 초기화
+            this.querySelector('input[name="content"]').value = '';
+    
+        } catch (error) {
+            console.error('Error:', error);
+            alert(error.message);
+        }
+    });
+</script>

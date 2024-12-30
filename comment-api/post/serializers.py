@@ -18,7 +18,7 @@ class CommentBriefSerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(serializers.ModelSerializer):
-
+    
     comments = CommentBriefSerializer(many=True, read_only=True)
     comment_url = serializers.SerializerMethodField()
     class Meta:
@@ -28,7 +28,7 @@ class PostSerializer(serializers.ModelSerializer):
     
     def get_comment_url(self, obj):
         request = self.context['request']
-        relative_url = reverse('comment_list_create', kwargs={'post_id': obj.id})
+        relative_url = reverse('comment_create', kwargs={'post_id': obj.id})
         if request:
             return request.build_absolute_uri(relative_url)
         return relative_url
