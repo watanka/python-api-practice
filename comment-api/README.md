@@ -45,3 +45,7 @@ TODO
     - [ ]  self.request.user에 대한 예외 처리의 best practice 필요.
 - [x]  Post에 달린 `comment_url` 해당 post에 특정된 주소가 아니라, 일반적인 comment 생성 url을 리턴함.  CommentListCreateAPIView가 Create시에 특정 Post에 속한 Comment를 작성하도록 만들 필요가 있음.
 => view에서 kwargs로 전달받은 url의 일부를 serializer 저장.
+
+- [ ] 유저 관리. 동작 방식
+	- DB 저장 방식
+	- 토큰 발급 방식

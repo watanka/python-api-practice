@@ -27,12 +27,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-AUTH_USER_MODEL = 'user.User'
+# AUTH_USER_MODEL = 'user.User'
 
 # Application definition
 
 INSTALLED_APPS = [
     'rest_framework',
+    'rest_framework.authtoken',
     'post.apps.PostConfig',
     'user.apps.UserConfig',
     "django.contrib.admin",
@@ -79,13 +80,45 @@ TEMPLATES = [
     },
 ]
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
+CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_HTTPONLY = False
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000']
+
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/0',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'PASSWORD': 'password',
+            'SOCKET_CONNECT_TIMEOUT': 10,
+            'SOCKET_TIMEOUT': 5,
+            'CONNECTION_POOL_KWARGS': {
+                'max_connections': 100,
+            },
+            'RETRY_ON_TIMEOUT': True,
+        }
+    }
+}
+
+SESSION_SAVE_EVERY_REQUEST = False  # 매 요청마다 세션 저장하지 않음
+
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.TemplateHTMLRenderer',
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
     ],
     'DEFAULT_TEMPLATE_CONTEXT_PROCESSORS': [
         'django.template.context_processors.request',
     ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ]
 }
 
 WSGI_APPLICATION = "config.wsgi.application"

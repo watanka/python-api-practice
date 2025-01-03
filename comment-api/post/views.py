@@ -8,21 +8,17 @@ from .serializers import PostSerializer, CommentSerializer
 # Create your views here.
 
 class PostListCreateView(generics.ListCreateAPIView):
-    renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'post/index.html'
     serializer_class = PostSerializer
 
     def get(self, request, *args, **kwargs):
         posts = Post.objects.all()
         serializer = self.get_serializer(posts, many=True)
-        return Response({'posts': serializer.data})
+        return Response(serializer.data)
     
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             serializer.save(author=request.user)
-            return redirect('post_create')
-        return Response({'serializer': serializer}, template_name='post/new-post.html')
 
 class CommentCreateView(generics.CreateAPIView):
     serializer_class = CommentSerializer
@@ -39,11 +35,8 @@ class CommentCreateView(generics.CreateAPIView):
 
 
 class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
-    renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'post/detail.html'
-
     serializer_class = PostSerializer
 
     def get(self, request, *args, **kwargs):
         post = get_object_or_404(Post, pk=kwargs['pk'])
-        return Response({'post': post})
+        return Response(post)
