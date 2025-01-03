@@ -49,3 +49,11 @@ TODO
 - [ ] 유저 관리. 동작 방식
 	- DB 저장 방식
 	- 토큰 발급 방식
+
+- JWT 토큰 방식 구현
+- 폼 작성
+- 기본정보 외 추가 email, 주소 등
+- logout 추가
+- frontend 구현
+- OAuth 추가
+- frontend 수정
